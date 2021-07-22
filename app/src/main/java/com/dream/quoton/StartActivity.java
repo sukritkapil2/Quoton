@@ -7,21 +7,21 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
-    private Button startJourneyButton;
+    private Button skipButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_welcome);
+        setContentView(R.layout.activity_start);
 
-        startJourneyButton = findViewById(R.id.start_journey_button);
+        skipButton = findViewById(R.id.skip_btn);
 
-        startJourneyButton.setOnClickListener(new View.OnClickListener() {
+        skipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(WelcomeActivity.this, StartActivity.class);
+                Intent intent = new Intent(StartActivity.this, HomeActivity.class);
                 startActivity(intent);
             }
         });

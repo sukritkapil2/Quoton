@@ -9,10 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Quoton">
+        <activity android:name=".HomeActivity"
+            android:theme="@style/Theme.Quoton.ConfidenceBackgroundImage"></activity>
+        <activity
+            android:name=".StartActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Quoton.StartScreenBackgroundImage" />
         <activity
             android:name=".WelcomeActivity"
-            android:theme="@style/Theme.Quoton.WelcomeScreenBackgroundImage"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Quoton.WelcomeScreenBackgroundImage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

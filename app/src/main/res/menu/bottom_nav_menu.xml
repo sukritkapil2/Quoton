@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/category"
+        android:title="Category"
+        android:icon="@drawable/ic_baseline_category_24"/>
+    <item
+        android:id="@+id/saved"
+        android:title="Saved"
+        android:icon="@drawable/ic_baseline_bookmark_24"/>
+    <item
+        android:id="@+id/trends"
+        android:title="Trends"
+        android:icon="@drawable/ic_baseline_trending_up_24"/>
+    <item
+        android:id="@+id/profile"
+        android:title="profile"
+        android:icon="@drawable/ic_baseline_face_24"/>
+    <item
+        android:id="@+id/invisible"
+        android:visible="false"
+        android:icon="@drawable/ic_baseline_face_24"
+        android:title="invisible" />
+</menu>

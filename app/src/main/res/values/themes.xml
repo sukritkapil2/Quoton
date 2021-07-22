@@ -18,4 +18,14 @@
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+    <style name="Theme.Quoton.StartScreenBackgroundImage">
+        <item name="android:windowBackground">@drawable/start_screen</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <style name="Theme.Quoton.ConfidenceBackgroundImage">
+        <item name="android:windowBackground">@drawable/confidence</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>
