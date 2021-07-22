@@ -58,4 +58,17 @@
         android:layout_marginTop="5dp"
         android:textColor="@color/white"></TextView>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Start Journey"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/montserrat_regular"
+        android:backgroundTint="@color/white"
+        android:textAllCaps="false"></androidx.appcompat.widget.AppCompatButton>
+
 </RelativeLayout>
