@@ -9,8 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Quoton">
-        <activity android:name=".HomeActivity"
-            android:theme="@style/Theme.Quoton.ConfidenceBackgroundImage"></activity>
+        <activity android:name=".HomeActivity"></activity>
         <activity
             android:name=".StartActivity"
             android:screenOrientation="portrait"

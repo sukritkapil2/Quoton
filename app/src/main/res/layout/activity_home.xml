@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/confidence"
+    android:id="@+id/main_layout"
     tools:context=".HomeActivity">
 
     <include android:id="@+id/toolbar" layout="@layout/home_toolbar"></include>
@@ -13,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
+        android:translationZ="90dp"
         android:background="@color/black"
         android:id="@+id/scrolling_tags"
         android:text="Confidence        Nature      Lifestyle       Spiritual       Positivity      Fearless"
@@ -37,7 +39,7 @@
         android:layout_marginLeft="30dp"
         android:id="@+id/quote_card"
         android:layout_marginRight="30dp"
-        android:background="@drawable/quote_card"
+        android:background="@drawable/quote_card_confidence"
         android:orientation="vertical">
 
         <LinearLayout

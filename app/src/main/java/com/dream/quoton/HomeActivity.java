@@ -2,6 +2,7 @@ package com.dream.quoton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,13 +14,17 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dream.quoton.Models.Quote;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,12 +50,15 @@ public class HomeActivity extends AppCompatActivity {
     private Button upButton, downButton;
     private BottomNavigationView bottomNavigationView;
     private ImageView backButton;
+    private RelativeLayout relativeLayout;
     private LinearLayout quoteCard;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference quotes = db.collection("quotes");
     private List<String> idsList;
     private List<Integer> randomIndex;
-    private int counter = 0;
+    private List<Quote> quoteList = new ArrayList<>(0);
+    private Boolean allVisited = false;
+    private int counter = -1;
     private Random randNum;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -65,6 +73,7 @@ public class HomeActivity extends AppCompatActivity {
         quoteCard = findViewById(R.id.quote_card);
         quote = findViewById(R.id.quote);
         tag = findViewById(R.id.tag);
+        relativeLayout = findViewById(R.id.main_layout);
 
         scrollingTags.setSelected(true);
         bottomNavigationView.setSelectedItemId(R.id.invisible);
@@ -72,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
         quotes.document("count").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     int count = (int) task.getResult().getLong("count").intValue();
                     idsList = (List<String>) task.getResult().get("id_array");
 
@@ -83,7 +92,7 @@ public class HomeActivity extends AppCompatActivity {
                         set.add(randNum.nextInt(count));
                     }
                     randomIndex = new ArrayList<>(set);
-                    Log.i("s", "TEST TEST TEST"+set);
+                    Log.i("s", "TEST TEST TEST" + set);
                 }
             }
         });
@@ -100,39 +109,81 @@ public class HomeActivity extends AppCompatActivity {
 
         quoteCard.setOnTouchListener(new OnSwipeTouchListener(HomeActivity.this) {
             public void onSwipeTop() {
-                // Get instance of Vibrator from current Context
+                Animation animation;
+                AnimationSet animationSet = new AnimationSet(true);
 
-                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                    v.vibrate(100);
-                    TranslateAnimation animate = new TranslateAnimation(0,0,0,-quoteCard.getHeight()/2);
-                    animate.setDuration(200);
-                    animate.setFillAfter(false);
-                    quoteCard.startAnimation(animate);
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-                    if(counter >= randomIndex.size()) counter = 0;
+                TranslateAnimation animate = new TranslateAnimation(0, 0, 0, -quoteCard.getHeight());
+                animate.setDuration(300);
+                animate.setFillAfter(false);
+                animationSet.addAnimation(animate);
+                AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
+                anim.setDuration(100);
+                animationSet.addAnimation(anim);
+                animation = animationSet;
+                animation.setDuration(300);
 
-                    String id = idsList.get(randomIndex.get(counter));
-                    counter++;
+                if (counter >= randomIndex.size() || counter == -1) counter = 0;
 
+                String id = idsList.get(randomIndex.get(counter));
+
+                if (quoteList.size() != randomIndex.size()) {
                     quotes.document(id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful()) {
-                                quote.setText(task.getResult().get("quote").toString());
-                                tag.setText(task.getResult().get("tag").toString().toUpperCase());
+                            if (task.isSuccessful()) {
+                                Quote quoteObj = new Quote(task.getResult().get("quote").toString(), task.getResult().get("tag").toString(), 0, 0, "", "", "");
+                                quoteList.add(quoteObj);
+                                counter++;
+                                quoteCard.startAnimation(animation);
+                                v.vibrate(50);
+                                quote.setText(quoteObj.getQuote());
+                                tag.setText(quoteObj.getTag().toUpperCase());
+
+                                if (quoteObj.getTag().equals("nature")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nature));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_nature));
+                                }
+                                else if (quoteObj.getTag().equals("lifestyle")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.lifestyle));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_lifestyle));
+                                }
+                                else if (quoteObj.getTag().equals("confidence")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.confidence));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_confidence));
+                                }
+                                else if (quoteObj.getTag().equals("spiritual")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.spiritual));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_spiritual));
+                                }
                             }
                         }
                     });
-
-                    AlphaAnimation anim = new AlphaAnimation(1.0f, 0.0f);
-                    anim.setDuration(100);
-                    quoteCard.clearAnimation();
-                    quoteCard.startAnimation(anim);
-                    AlphaAnimation anim2 = new AlphaAnimation(0.0f, 1.0f);
-                    anim2.setDuration(200);
-                quoteCard.clearAnimation();
-                quoteCard.startAnimation(anim2);
-                    quoteCard.setVisibility(View.VISIBLE);
+                } else {
+                    Quote quoteObj = quoteList.get(counter);
+                    counter++;
+                    quoteCard.startAnimation(animation);
+                    v.vibrate(50);
+                    quote.setText(quoteObj.getQuote());
+                    tag.setText(quoteObj.getTag().toUpperCase());
+                    if (quoteObj.getTag().equals("nature")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nature));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_nature));
+                    }
+                    else if (quoteObj.getTag().equals("lifestyle")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.lifestyle));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_lifestyle));
+                    }
+                    else if (quoteObj.getTag().equals("confidence")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.confidence));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_confidence));
+                    }
+                    else if (quoteObj.getTag().equals("spiritual")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.spiritual));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_spiritual));
+                    }
+                }
             }
         });
     }
