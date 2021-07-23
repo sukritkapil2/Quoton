@@ -3,20 +3,18 @@ package com.dream.quoton.Models;
 public class Quote {
     String quote;
     String tag;
-    int ups;
-    int downs;
     String userPic;
     String userName;
     String userId;
+    int stars;
 
-    public Quote(String quote, String tag, int ups, int downs, String userPic, String userName, String userId) {
+    public Quote(String quote, String tag, String userPic, String userName, String userId, int stars) {
         this.quote = quote;
         this.tag = tag;
-        this.ups = ups;
-        this.downs = downs;
         this.userPic = userPic;
         this.userName = userName;
         this.userId = userId;
+        this.stars = stars;
     }
 
     public String getQuote() {
@@ -33,22 +31,6 @@ public class Quote {
 
     public void setTag(String tag) {
         this.tag = tag;
-    }
-
-    public int getUps() {
-        return ups;
-    }
-
-    public void setUps(int ups) {
-        this.ups = ups;
-    }
-
-    public int getDowns() {
-        return downs;
-    }
-
-    public void setDowns(int downs) {
-        this.downs = downs;
     }
 
     public String getUserPic() {
@@ -73,5 +55,13 @@ public class Quote {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public int getStars() {
+        return stars;
+    }
+
+    public void setStars(int stars) {
+        this.stars = stars;
     }
 }

@@ -1,6 +1,7 @@
 package com.dream.quoton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -24,12 +25,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.dream.quoton.Models.Quote;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
@@ -44,11 +58,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class HomeActivity extends AppCompatActivity {
 
-    private TextView scrollingTags, quote, tag, ups_downs, user_name;
-    private Button upButton, downButton;
+    private TextView scrollingTags, quote, tag, stars_count, user_name;
+    private CircleImageView userPic;
     private BottomNavigationView bottomNavigationView;
+    private FloatingActionButton fab;
     private ImageView backButton;
     private RelativeLayout relativeLayout;
     private LinearLayout quoteCard;
@@ -60,6 +77,7 @@ public class HomeActivity extends AppCompatActivity {
     private Boolean allVisited = false;
     private int counter = -1;
     private Random randNum;
+    private FirebaseAuth mAuth;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -74,15 +92,35 @@ public class HomeActivity extends AppCompatActivity {
         quote = findViewById(R.id.quote);
         tag = findViewById(R.id.tag);
         relativeLayout = findViewById(R.id.main_layout);
+        fab = findViewById(R.id.add_btn);
+        stars_count = findViewById(R.id.stars_count);
+        userPic = findViewById(R.id.user_pic);
+        user_name = findViewById(R.id.name);
+        mAuth = FirebaseAuth.getInstance();
+
 
         scrollingTags.setSelected(true);
         bottomNavigationView.setSelectedItemId(R.id.invisible);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mAuth.getCurrentUser() != null) {
+                    startActivity(new Intent(HomeActivity.this, AddActivity.class));
+                } else {
+                    startActivity(new Intent(HomeActivity.this, StartActivity.class));
+                }
+
+            }
+        });
 
         quotes.document("count").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     int count = (int) task.getResult().getLong("count").intValue();
+                    String headline = task.getResult().get("headline").toString();
+                    scrollingTags.setText(headline);
                     idsList = (List<String>) task.getResult().get("id_array");
 
                     randNum = new Random();
@@ -124,7 +162,12 @@ public class HomeActivity extends AppCompatActivity {
                 animation = animationSet;
                 animation.setDuration(300);
 
-                if (counter >= randomIndex.size() || counter == -1) counter = 0;
+                if(counter == -1) counter = 0;
+
+                if (counter >= randomIndex.size()) {
+                    counter = 0;
+                    Toast.makeText(HomeActivity.this, "You have seen it all \uD83D\uDE0A!", Toast.LENGTH_SHORT).show();
+                }
 
                 String id = idsList.get(randomIndex.get(counter));
 
@@ -133,29 +176,35 @@ public class HomeActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
-                                Quote quoteObj = new Quote(task.getResult().get("quote").toString(), task.getResult().get("tag").toString(), 0, 0, "", "", "");
+                                Quote quoteObj = new Quote(task.getResult().get("quote").toString(), task.getResult().get("tag").toString(), task.getResult().get("userPic").toString(), task.getResult().get("userName").toString(), task.getResult().get("userId").toString(), task.getResult().getLong("stars").intValue());
                                 quoteList.add(quoteObj);
                                 counter++;
                                 quoteCard.startAnimation(animation);
                                 v.vibrate(50);
                                 quote.setText(quoteObj.getQuote());
                                 tag.setText(quoteObj.getTag().toUpperCase());
+                                stars_count.setText("∞ " + quoteObj.getStars() + " Stars ∞");
+                                Glide.with(getApplicationContext()).load(quoteObj.getUserPic()).into(userPic);
+                                user_name.setText(quoteObj.getUserName());
 
                                 if (quoteObj.getTag().equals("nature")) {
                                     relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nature));
                                     quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_nature));
-                                }
-                                else if (quoteObj.getTag().equals("lifestyle")) {
+                                } else if (quoteObj.getTag().equals("lifestyle")) {
                                     relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.lifestyle));
                                     quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_lifestyle));
-                                }
-                                else if (quoteObj.getTag().equals("confidence")) {
+                                } else if (quoteObj.getTag().equals("confidence")) {
                                     relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.confidence));
                                     quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_confidence));
-                                }
-                                else if (quoteObj.getTag().equals("spiritual")) {
+                                } else if (quoteObj.getTag().equals("spiritual")) {
                                     relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.spiritual));
                                     quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_spiritual));
+                                } else if (quoteObj.getTag().equals("positivity")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.positivity));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_positivity));
+                                } else if (quoteObj.getTag().equals("general")) {
+                                    relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.general));
+                                    quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_general));
                                 }
                             }
                         }
@@ -167,24 +216,32 @@ public class HomeActivity extends AppCompatActivity {
                     v.vibrate(50);
                     quote.setText(quoteObj.getQuote());
                     tag.setText(quoteObj.getTag().toUpperCase());
+                    stars_count.setText("∞ " + quoteObj.getStars() + " Stars ∞");
+                    Glide.with(getApplicationContext()).load(quoteObj.getUserPic()).into(userPic);
+                    user_name.setText(quoteObj.getUserName());
                     if (quoteObj.getTag().equals("nature")) {
                         relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nature));
                         quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_nature));
-                    }
-                    else if (quoteObj.getTag().equals("lifestyle")) {
+                    } else if (quoteObj.getTag().equals("lifestyle")) {
                         relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.lifestyle));
                         quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_lifestyle));
-                    }
-                    else if (quoteObj.getTag().equals("confidence")) {
+                    } else if (quoteObj.getTag().equals("confidence")) {
                         relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.confidence));
                         quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_confidence));
-                    }
-                    else if (quoteObj.getTag().equals("spiritual")) {
+                    } else if (quoteObj.getTag().equals("spiritual")) {
                         relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.spiritual));
                         quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_spiritual));
+                    } else if (quoteObj.getTag().equals("positivity")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.positivity));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_positivity));
+                    } else if (quoteObj.getTag().equals("general")) {
+                        relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.general));
+                        quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_general));
                     }
                 }
             }
         });
     }
+
+
 }

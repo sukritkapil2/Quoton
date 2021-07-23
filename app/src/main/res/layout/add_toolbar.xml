@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quoton"
+        android:text="Publish Quote"
         android:fontFamily="@font/montserrat_bold"
         android:textSize="20sp"
         android:layout_centerHorizontal="true"
@@ -18,16 +18,6 @@
         android:textColor="@color/grey"
         android:id="@+id/main_heading"
         ></TextView>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/share_icon"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_baseline_share_24"
-        android:layout_marginRight="25dp"
-        app:tint="@color/grey"></ImageView>
 
     <ImageView
         android:layout_width="wrap_content"

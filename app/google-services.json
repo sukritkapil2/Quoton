@@ -12,12 +12,7 @@
           "package_name": "com.dream.quoton"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "556143951492-fad3e7v0bf1lpqj78easgd7smcarc2dk.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyBkmpdctqSRqxL20Os6UUHI_s-w4vdV4yg"

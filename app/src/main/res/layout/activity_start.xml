@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".StartActivity"
+    android:id="@+id/main_layout"
     android:background="@drawable/start_screen">
 
     <include layout="@layout/toolbar" android:id="@+id/toolbar"></include>
@@ -39,20 +40,13 @@
         android:textColor="@color/white"
         android:fontFamily="@font/montserrat_bold"></TextView>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
+    <com.google.android.gms.common.SignInButton
         android:id="@+id/google_login_btn"
-        android:background="@drawable/google_custom_button"
         android:layout_below="@id/head2"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginTop="100dp"
-        android:textAllCaps="false"
-        android:textSize="16sp"
-        android:text="Google Sign In"
-        android:fontFamily="@font/montserrat_bold"
-        android:textColor="@color/white"></androidx.appcompat.widget.AppCompatButton>
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
@@ -60,8 +54,10 @@
         android:textSize="16sp"
         android:id="@+id/skip_btn"
         android:background="@drawable/custom_button"
-        android:layout_below="@id/google_login_btn"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="40dp"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/black"
         android:layout_marginRight="40dp"
         android:layout_marginTop="20dp"
         android:textAllCaps="false"

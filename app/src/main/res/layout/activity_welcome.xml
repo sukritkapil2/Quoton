@@ -67,6 +67,7 @@
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
+        android:textColor="@color/black"
         android:background="@drawable/custom_button"
         android:fontFamily="@font/montserrat_regular"
         android:backgroundTint="@color/white"

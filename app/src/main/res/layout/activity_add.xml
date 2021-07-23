@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/add"
+    android:id="@+id/main_layout"
+    tools:context=".AddActivity">
+
+    <include android:id="@+id/toolbar" layout="@layout/add_toolbar"></include>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Quote"
+        android:fontFamily="@font/montserrat_light"
+        android:layout_below="@id/toolbar"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/quote_head"
+        ></TextView>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/quote_head"
+        android:layout_marginLeft="20dp"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:gravity="top"
+        android:hint="Write your thoughts here ..."
+        android:layout_marginTop="20dp"
+        android:id="@+id/quote_edit"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:scrollbarStyle="insideInset"
+        android:scrollbars="vertical"
+        android:lines="3"
+        android:scrollHorizontally="false"
+        android:background="@drawable/custom_edit"
+        ></EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tag"
+        android:fontFamily="@font/montserrat_light"
+        android:layout_below="@id/quote_edit"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/tag_head"
+        ></TextView>
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/spinner"
+        android:layout_below="@id/tag_head"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:text="Publish Quote"
+        android:id="@+id/publish_btn"
+        android:textColor="@color/black"
+        android:background="@drawable/custom_button"
+        android:layout_below="@id/spinner"
+        android:textAllCaps="false"
+        android:fontFamily="@font/montserrat_light"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
+        ></androidx.appcompat.widget.AppCompatButton>
+
+</RelativeLayout>
