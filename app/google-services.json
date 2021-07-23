@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "556143951492",
+    "project_id": "quoton-239d7",
+    "storage_bucket": "quoton-239d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556143951492:android:37d80ce7d6ad897df30cd1",
+        "android_client_info": {
+          "package_name": "com.dream.quoton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "556143951492-fad3e7v0bf1lpqj78easgd7smcarc2dk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkmpdctqSRqxL20Os6UUHI_s-w4vdV4yg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "556143951492-fad3e7v0bf1lpqj78easgd7smcarc2dk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
