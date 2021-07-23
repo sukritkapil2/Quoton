@@ -47,14 +47,17 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -64,6 +67,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private TextView scrollingTags, quote, tag, stars_count, user_name;
     private CircleImageView userPic;
+    private ImageView starQuote;
     private BottomNavigationView bottomNavigationView;
     private FloatingActionButton fab;
     private ImageView backButton;
@@ -71,6 +75,7 @@ public class HomeActivity extends AppCompatActivity {
     private LinearLayout quoteCard;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference quotes = db.collection("quotes");
+    private CollectionReference users = db.collection("users");
     private List<String> idsList;
     private List<Integer> randomIndex;
     private List<Quote> quoteList = new ArrayList<>(0);
@@ -97,6 +102,7 @@ public class HomeActivity extends AppCompatActivity {
         userPic = findViewById(R.id.user_pic);
         user_name = findViewById(R.id.name);
         mAuth = FirebaseAuth.getInstance();
+        starQuote = findViewById(R.id.star_quote);
 
 
         scrollingTags.setSelected(true);
@@ -166,7 +172,10 @@ public class HomeActivity extends AppCompatActivity {
 
                 if (counter >= randomIndex.size()) {
                     counter = 0;
-                    Toast.makeText(HomeActivity.this, "You have seen it all \uD83D\uDE0A!", Toast.LENGTH_SHORT).show();
+                    if(!allVisited) {
+                        Toast.makeText(HomeActivity.this, "You have seen it all \uD83D\uDE0A!", Toast.LENGTH_SHORT).show();
+                        allVisited = true;
+                    }
                 }
 
                 String id = idsList.get(randomIndex.get(counter));
@@ -176,7 +185,7 @@ public class HomeActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
-                                Quote quoteObj = new Quote(task.getResult().get("quote").toString(), task.getResult().get("tag").toString(), task.getResult().get("userPic").toString(), task.getResult().get("userName").toString(), task.getResult().get("userId").toString(), task.getResult().getLong("stars").intValue());
+                                Quote quoteObj = new Quote(task.getResult().get("quote").toString(), task.getResult().get("tag").toString(), task.getResult().get("userPic").toString(), task.getResult().get("userName").toString(), task.getResult().get("userId").toString(), task.getResult().getLong("stars").intValue(),false);
                                 quoteList.add(quoteObj);
                                 counter++;
                                 quoteCard.startAnimation(animation);
@@ -186,6 +195,21 @@ public class HomeActivity extends AppCompatActivity {
                                 stars_count.setText("∞ " + quoteObj.getStars() + " Stars ∞");
                                 Glide.with(getApplicationContext()).load(quoteObj.getUserPic()).into(userPic);
                                 user_name.setText(quoteObj.getUserName());
+
+                                quotes.document(id).collection("starred").document(mAuth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            DocumentSnapshot documentSnapshot = task.getResult();
+                                            if(documentSnapshot.exists() && documentSnapshot.getBoolean("saved")) {
+                                                quoteList.get(counter-1).setSaved(true);
+                                                starQuote.setBackgroundResource(R.drawable.ic_baseline_star_24);
+                                            } else {
+                                                starQuote.setBackgroundResource(R.drawable.ic_baseline_star_border_24);
+                                            }
+                                        }
+                                    }
+                                });
 
                                 if (quoteObj.getTag().equals("nature")) {
                                     relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.nature));
@@ -217,6 +241,12 @@ public class HomeActivity extends AppCompatActivity {
                     quote.setText(quoteObj.getQuote());
                     tag.setText(quoteObj.getTag().toUpperCase());
                     stars_count.setText("∞ " + quoteObj.getStars() + " Stars ∞");
+                    if(quoteObj.getSaved()) {
+                        quoteList.get(counter-1).setSaved(true);
+                        starQuote.setBackgroundResource(R.drawable.ic_baseline_star_24);
+                    } else {
+                        starQuote.setBackgroundResource(R.drawable.ic_baseline_star_border_24);
+                    }
                     Glide.with(getApplicationContext()).load(quoteObj.getUserPic()).into(userPic);
                     user_name.setText(quoteObj.getUserName());
                     if (quoteObj.getTag().equals("nature")) {
@@ -238,6 +268,42 @@ public class HomeActivity extends AppCompatActivity {
                         relativeLayout.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.general));
                         quoteCard.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.quote_card_general));
                     }
+                }
+            }
+        });
+
+        starQuote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int tempCounter = counter-1;
+
+                if(quoteList.get(tempCounter).getSaved()) {
+                    stars_count.setText("∞ " + (quoteList.get(tempCounter).getStars()-1) + " Stars ∞");
+                    starQuote.setBackgroundResource(R.drawable.ic_baseline_star_border_24);
+                    quotes.document(idsList.get(tempCounter)).collection("starred").document(mAuth.getCurrentUser().getUid()).update("saved", false).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            quoteList.get(tempCounter).setStars(quoteList.get(tempCounter).getStars()-1);
+                            quoteList.get(tempCounter).setSaved(false);
+                        }
+                    });
+                } else {
+                    starQuote.setBackgroundResource(R.drawable.ic_baseline_star_24);
+                    stars_count.setText("∞ " + (quoteList.get(tempCounter).getStars()+1) + " Stars ∞");
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("saved", true);
+                    quotes.document(idsList.get(tempCounter)).collection("starred").document(mAuth.getCurrentUser().getUid()).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            quotes.document(idsList.get(tempCounter)).update("stars", FieldValue.increment(1)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    quoteList.get(tempCounter).setStars(quoteList.get(tempCounter).getStars()+1);
+                                    quoteList.get(tempCounter).setSaved(true);
+                                }
+                            });
+                        }
+                    });
                 }
             }
         });

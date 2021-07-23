@@ -23,6 +23,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -31,6 +40,8 @@ public class StartActivity extends AppCompatActivity {
     private int RC_SIGN_IN = 100;
     private RelativeLayout relativeLayout;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference users = db.collection("users");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +113,29 @@ public class StartActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Snackbar.make(relativeLayout, "Google Sign In Successful", Snackbar.LENGTH_LONG).show();
-                            Intent intent = new Intent(StartActivity.this, HomeActivity.class);
-                            startActivity(intent);
+                            DocumentReference documentReference = users.document(mAuth.getCurrentUser().getUid());
+                            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful()) {
+                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                        if(!documentSnapshot.exists()) {
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("name", mAuth.getCurrentUser().getDisplayName());
+                                            data.put("id", mAuth.getCurrentUser().getUid());
+                                            data.put("pic", mAuth.getCurrentUser().getPhotoUrl().toString());
+                                            users.document(mAuth.getCurrentUser().getUid()).set(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Snackbar.make(relativeLayout, "Google Sign In Successful", Snackbar.LENGTH_LONG).show();
+                                                    Intent intent = new Intent(StartActivity.this, HomeActivity.class);
+                                                    startActivity(intent);
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             Snackbar.make(relativeLayout, "Error in authentication: " + task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
                         }

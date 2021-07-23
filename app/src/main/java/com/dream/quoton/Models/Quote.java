@@ -7,14 +7,16 @@ public class Quote {
     String userName;
     String userId;
     int stars;
+    Boolean saved;
 
-    public Quote(String quote, String tag, String userPic, String userName, String userId, int stars) {
+    public Quote(String quote, String tag, String userPic, String userName, String userId, int stars, Boolean saved) {
         this.quote = quote;
         this.tag = tag;
         this.userPic = userPic;
         this.userName = userName;
         this.userId = userId;
         this.stars = stars;
+        this.saved = saved;
     }
 
     public String getQuote() {
@@ -63,5 +65,13 @@ public class Quote {
 
     public void setStars(int stars) {
         this.stars = stars;
+    }
+
+    public Boolean getSaved() {
+        return saved;
+    }
+
+    public void setSaved(Boolean saved) {
+        this.saved = saved;
     }
 }

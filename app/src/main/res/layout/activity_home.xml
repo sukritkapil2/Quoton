@@ -126,11 +126,11 @@
                 android:layout_marginTop="20dp"></TextView>
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_star_border_24"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginTop="18dp"
                 android:layout_weight="0.5"
+                android:id="@+id/star_quote"
                 app:tint="@color/white"></ImageView>
         </LinearLayout>
 
